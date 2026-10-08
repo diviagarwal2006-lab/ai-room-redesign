@@ -1,0 +1,33 @@
+{
+  "roomType": "bedroom",
+  "roomTypeConfidence": 0.92,
+  "dimensions": { "widthM": 4.0, "lengthM": 3.5, "heightM": 2.7, "isEstimate": true },
+  "walls": { "color": "#E8E1D5", "colorName": "off-white" },
+  "floor": { "material": "wood", "color": "#A67B5B" },
+  "windows": [
+    { "wall": "north", "widthM": 1.2, "heightM": 1.3 }
+  ],
+  "doors": [
+    { "wall": "south", "widthM": 0.9, "heightM": 2.1 }
+  ],
+  "furniture": [
+    {
+      "id": "f1",
+      "type": "bed",
+      "color": "#8899AA",
+      "position": { "x": 0.5, "z": 0.25 },
+      "sizeM": { "w": 1.6, "d": 2.0, "h": 0.6 },
+      "confidence": 0.9
+    },
+    {
+      "id": "f2",
+      "type": "wardrobe",
+      "color": "#6B4F3A",
+      "position": { "x": 0.9, "z": 0.7 },
+      "sizeM": { "w": 1.2, "d": 0.6, "h": 2.0 },
+      "confidence": 0.8
+    }
+  ],
+  "dominantColors": ["#E8E1D5", "#A67B5B", "#8899AA"],
+  "uncertainties": ["Ceiling height guessed, no reference object visible"]
+}
