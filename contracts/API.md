@@ -36,6 +36,11 @@ Walls: north | south | east | west
 position.x / position.z: 0 to 1 across the room, (0,0) = north-west corner 
 Wall labels: "north" = the wall straight ahead in photo 1. Going clockwise: east = right,
 south = behind the camera, west = left. Room sizes and positions are AI ESTIMATES.
-
+Modifications: null or [] means "no change". style is a short lowercase word or null.
+  lighting is { tone: warm|neutral|cool, add: [names] } or null.
+  addFurniture[].placement is one of: corners, along_wall, center, near_window.
+  addFurniture[].quantity is a whole number from 1 to 10.
+  removeFurniture is a list of furniture ids that exist in room.furniture (for example "f2").
+  The summary is one sentence describing what was understood.
 ## Rule
 Changing anything in this folder needs all 3 people to agree.

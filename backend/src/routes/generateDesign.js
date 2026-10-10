@@ -5,6 +5,8 @@ import { isSupabaseConfigured } from '../db/supabase.js';
 import { getRoom } from '../db/rooms.js';
 import { saveDesign, formatDesign } from '../db/designs.js';
 import { isUuid } from '../utils/validate.js';
+import { isRealAi } from '../ai/gemini.js';
+import { parseInstruction } from '../ai/parseInstruction.js';
 
 const router = Router();
 const MAX_INSTRUCTION_LENGTH = 500;
@@ -53,13 +55,18 @@ router.post('/', async (req, res, next) => {
       );
     }
 
-    // Still fake: the modifications and the result image (real AI comes later)
+    // Still fake: the result image (real image generation comes next)
     const fake = mockDesign({ roomId, instruction: cleanInstruction });
+
+    // Pipeline B: real AI turns the sentence into modifications JSON
+    const modifications = isRealAi
+      ? await parseInstruction(room.analysis, cleanInstruction)
+      : fake.modifications;
 
     const design = await saveDesign({
       roomId,
       instruction: cleanInstruction,
-      modifications: fake.modifications,
+      modifications,
       originalImageUrl: room.photos[index].url,
       resultImageUrl: fake.resultImageUrl,
     });
