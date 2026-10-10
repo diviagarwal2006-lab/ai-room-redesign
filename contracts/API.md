@@ -15,11 +15,12 @@ POST /api/analyze-room    -> multipart field "photos" (2-4 images, max 5 MB each
 POST /api/generate-design -> JSON { roomId, instruction (max 500 chars), photoIndex? }
                              returns { designId, status, roomId, instruction, modifications,
                                        originalImageUrl, resultImageUrl, room, mock, createdAt }
+                            roomId must come from /api/analyze-room; photoIndex picks the original photo (default 0)
 GET  /api/design/:id      -> same data as generate-design
 
 ## Error codes
 400 TOO_FEW_PHOTOS, TOO_MANY_PHOTOS, INVALID_FILE_TYPE, ROOM_ID_MISSING,
-    INSTRUCTION_MISSING, INSTRUCTION_TOO_LONG, INVALID_JSON, INVALID_FIELD, UPLOAD_ERROR
+    INSTRUCTION_MISSING, INSTRUCTION_TOO_LONG, INVALID_JSON, INVALID_FIELD, UPLOAD_ERROR,INVALID_PHOTO_INDEX,
 404 ROOM_NOT_FOUND, DESIGN_NOT_FOUND, NOT_FOUND
 413 FILE_TOO_LARGE
 422 INSTRUCTION_UNCLEAR
