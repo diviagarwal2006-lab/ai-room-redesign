@@ -6,14 +6,19 @@ import { uploadPhotos, validatePhotos } from '../middleware/upload.js';
 import { isSupabaseConfigured } from '../db/supabase.js';
 import { uploadPhoto } from '../db/storage.js';
 import { saveRoom } from '../db/rooms.js';
+import { isRealAi } from '../ai/gemini.js';
+import { analyzeRoomPhotos } from '../ai/analyzeRoom.js';
 
 const router = Router();
 
-// M4: photos are stored for real (when Supabase is configured).
-// The room analysis is still fake (real AI comes later).
 router.post('/', uploadPhotos, validatePhotos, async (req, res, next) => {
   try {
     const result = mockAnalyzeRoom();
+
+    // Pipeline A: real AI analysis. We do it FIRST, so a failure stores nothing.
+    if (isRealAi) {
+      result.room = await analyzeRoomPhotos(req.files);
+    }
 
     if (isSupabaseConfigured) {
       const roomId = randomUUID();
@@ -43,6 +48,9 @@ router.post('/', uploadPhotos, validatePhotos, async (req, res, next) => {
         sizeBytes: file.size,
       }));
     }
+
+    // "mock" is false only when BOTH the analysis and the storage are real
+    result.mock = !(isRealAi && isSupabaseConfigured);
 
     sendOk(res, result);
   } catch (err) {

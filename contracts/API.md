@@ -33,7 +33,9 @@ GET  /api/design/:id      -> same data as generate-design
 Room and modifications shapes: see room.sample.json and modifications.sample.json
 Furniture types: bed, sofa, chair, table, desk, wardrobe, shelf, tv, lamp, plant, rug, curtain, other
 Walls: north | south | east | west
-position.x / position.z: 0 to 1 across the room, (0,0) = north-west corner
+position.x / position.z: 0 to 1 across the room, (0,0) = north-west corner 
+Wall labels: "north" = the wall straight ahead in photo 1. Going clockwise: east = right,
+south = behind the camera, west = left. Room sizes and positions are AI ESTIMATES.
 
 ## Rule
 Changing anything in this folder needs all 3 people to agree.
