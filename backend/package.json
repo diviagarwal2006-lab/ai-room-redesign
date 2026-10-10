@@ -5,13 +5,15 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node --watch src/index.js"
+    "dev": "node --watch src/index.js",
+    "ai-test": "node scripts/ai-smoke-test.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@google/genai": "^2.28.0",
     "@supabase/supabase-js": "^2.117.3",
     "cors": "^2.8.6",
     "dotenv": "^18.0.6",
