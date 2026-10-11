@@ -1,6 +1,6 @@
 # API Contract v1
 
-Base URL (local): http://localhost:5000
+Base URL (local): http://localhost:500
 
 ## Response shape (ALL endpoints)
 Success: { "ok": true,  "data": { ... } }
@@ -9,10 +9,13 @@ data.mock = true means the data is FAKE.
 
 ## Endpoints
 GET  /api/health          -> { status, aiMode }
-POST /api/analyze-room    -> multipart field "photos" (2-4 images, max 5 MB each)
+POST /api/analyze-room    -> multipart field "photos" (2-4 images, max 10 MB each)
                              returns { roomId, photos[{index,url}], room, mock }
                              photos[] also has name, mimeType, sizeBytes (extra info, safe to ignore)
-POST /api/generate-design -> JSON { roomId, instruction (max 500 chars), photoIndex? }
+                             Every photo is converted to JPEG, rotated upright, resized to at most 1600 px
+                             on its longest side and stripped of metadata (including GPS).
+                             photos[] also has storedBytes, width, height. sizeBytes is the ORIGINAL file size.
+POST /api/generate-design -> JSON { roomId, instruction (max 500 chars), photoIndex? } 
                              returns { designId, status, roomId, instruction, modifications,
                                        originalImageUrl, resultImageUrl, room, mock, createdAt }
                             roomId must come from /api/analyze-room; photoIndex picks the original photo (default 0)
@@ -20,7 +23,7 @@ GET  /api/design/:id      -> same data as generate-design
 
 ## Error codes
 400 TOO_FEW_PHOTOS, TOO_MANY_PHOTOS, INVALID_FILE_TYPE, ROOM_ID_MISSING,
-    INSTRUCTION_MISSING, INSTRUCTION_TOO_LONG, INVALID_JSON, INVALID_FIELD, UPLOAD_ERROR,INVALID_PHOTO_INDEX,
+    INSTRUCTION_MISSING, INSTRUCTION_TOO_LONG, INVALID_JSON, INVALID_FIELD, UPLOAD_ERROR,INVALID_PHOTO_INDEX,HEIC_NOT_SUPPORTED, IMAGE_TOO_SMALL
 404 ROOM_NOT_FOUND, DESIGN_NOT_FOUND, NOT_FOUND
 413 FILE_TOO_LARGE
 422 INSTRUCTION_UNCLEAR

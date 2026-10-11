@@ -24,3 +24,12 @@ export function detectImageType(buffer) {
 
   return null;
 }
+
+// iPhone photos can be HEIC. These files have "ftyp" at position 4 and a HEIC-style brand after it.
+const HEIC_BRANDS = ['heic', 'heix', 'hevc', 'hevx', 'heim', 'heis', 'mif1', 'msf1'];
+
+export function looksLikeHeic(buffer) {
+  if (!buffer || buffer.length < 12) return false;
+  if (buffer.toString('ascii', 4, 8) !== 'ftyp') return false;
+  return HEIC_BRANDS.includes(buffer.toString('ascii', 8, 12));
+}

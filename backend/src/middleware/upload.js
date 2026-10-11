@@ -1,10 +1,10 @@
 import multer from 'multer';
 import { AppError } from '../utils/response.js';
-import { detectImageType } from '../utils/imageType.js';
+import { detectImageType, looksLikeHeic } from '../utils/imageType.js';
 
 export const MIN_PHOTOS = 2;
 export const MAX_PHOTOS = 4;
-export const MAX_FILE_MB = 5;
+export const MAX_FILE_MB = 10; // camera photos are often 3 to 10 MB
 
 // multer reads the uploaded files and keeps them in memory (req.files)
 const upload = multer({
@@ -54,6 +54,15 @@ export function validatePhotos(req, res, next) {
   for (const file of files) {
     const type = detectImageType(file.buffer);
     if (!type) {
+      if (looksLikeHeic(file.buffer)) {
+        return next(
+          new AppError(
+            400,
+            'HEIC_NOT_SUPPORTED',
+            `"${file.originalname}" is an iPhone HEIC photo, which is not supported. Use the in-app camera, or set the phone camera to "Most Compatible" (JPEG) and try again.`
+          )
+        );
+      }
       return next(
         new AppError(400, 'INVALID_FILE_TYPE', `"${file.originalname}" is not a JPG, PNG or WebP image.`)
       );
