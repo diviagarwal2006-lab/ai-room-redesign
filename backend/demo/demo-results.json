@@ -1,0 +1,11 @@
+{
+  "rooms": [
+    {
+      "photo": { "name": "room1.jpg", "sizeBytes": 101908 },
+      "results": [
+        { "file": "modern-light-blue.jpg", "keywords": ["blue", "modern"] },
+        { "file": "green-walls.jpg", "keywords": ["green"] }
+      ]
+    }
+  ]
+}

@@ -7,13 +7,13 @@ import { saveDesign, formatDesign } from '../db/designs.js';
 import { isUuid } from '../utils/validate.js';
 import { isRealAi } from '../ai/gemini.js';
 import { parseInstruction } from '../ai/parseInstruction.js';
+import { pickDemoImage } from '../ai/demoImage.js';
 
 const router = Router();
 const MAX_INSTRUCTION_LENGTH = 500;
 
 router.post('/', async (req, res, next) => {
   try {
-    // req.body can be empty, so we default to {}
     const { roomId, instruction, photoIndex } = req.body ?? {};
 
     if (!roomId || typeof roomId !== 'string') {
@@ -31,12 +31,11 @@ router.post('/', async (req, res, next) => {
     }
     const cleanInstruction = instruction.trim();
 
-    // No Supabase keys: keep returning fake data, like in M2
+    // No Supabase keys: fake data, like in M2
     if (!isSupabaseConfigured) {
       return sendOk(res, mockDesign({ roomId, instruction: cleanInstruction }));
     }
 
-    // Find the stored room
     if (!isUuid(roomId)) {
       throw new AppError(404, 'ROOM_NOT_FOUND', 'No room found with that roomId.');
     }
@@ -45,7 +44,6 @@ router.post('/', async (req, res, next) => {
       throw new AppError(404, 'ROOM_NOT_FOUND', 'No room found with that roomId.');
     }
 
-    // Pick which uploaded photo is the "original" (default: the first one)
     const index = photoIndex ?? 0;
     if (!Number.isInteger(index) || index < 0 || index >= room.photos.length) {
       throw new AppError(
@@ -55,20 +53,21 @@ router.post('/', async (req, res, next) => {
       );
     }
 
-    // Still fake: the result image (real image generation comes next)
+    // Pipeline B: real AI understands the sentence
     const fake = mockDesign({ roomId, instruction: cleanInstruction });
-
-    // Pipeline B: real AI turns the sentence into modifications JSON
     const modifications = isRealAi
       ? await parseInstruction(room.analysis, cleanInstruction)
       : fake.modifications;
+
+    // Pipeline C: a prepared "after" image
+    const resultImageUrl = pickDemoImage(room, index, modifications, cleanInstruction);
 
     const design = await saveDesign({
       roomId,
       instruction: cleanInstruction,
       modifications,
       originalImageUrl: room.photos[index].url,
-      resultImageUrl: fake.resultImageUrl,
+      resultImageUrl,
     });
 
     sendOk(res, formatDesign(design, room));
