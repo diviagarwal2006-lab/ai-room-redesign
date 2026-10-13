@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { analyzeRoom, generateDesign } from './api.js';
-
+import CameraCapture from './CameraCapture.jsx';
 const MIN_PHOTOS = 2;
 const MAX_PHOTOS = 4;
 const ACCEPT = 'image/jpeg,image/png,image/webp';
@@ -23,7 +23,10 @@ export default function App() {
   function removePhoto(index) {
     setPhotos((current) => current.filter((_, i) => i !== index));
   }
-
+    function addPhoto(file) {
+    const photo = { file, preview: URL.createObjectURL(file) };
+    setPhotos((current) => [...current, photo].slice(0, MAX_PHOTOS));
+  }
   async function handleAnalyze() {
     setError('');
     setLoading('analyzing');
@@ -78,7 +81,7 @@ export default function App() {
           </label>
         </div>
         <p className="hint">Add {MIN_PHOTOS} to {MAX_PHOTOS} photos (JPG, PNG or WebP).</p>
-
+       <CameraCapture onCapture={addPhoto} disabled={photos.length >= MAX_PHOTOS} />
         <div className="thumbs">
           {photos.map((photo, index) => (
             <div className="thumb" key={photo.preview}>
@@ -150,6 +153,8 @@ export default function App() {
           <p>
             <b>What I understood:</b> {design.modifications.summary}
           </p>
+          <h2>3D view</h2>
+          <RoomViewer room={design.room} modifications={design.modifications} />
           <button className="button secondary" onClick={startOver}>Start over</button>
         </section>
       )}

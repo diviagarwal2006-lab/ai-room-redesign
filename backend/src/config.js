@@ -10,6 +10,9 @@ export const config = {
   storageBucket: process.env.SUPABASE_BUCKET || 'room-photos',
   geminiApiKey: process.env.GEMINI_API_KEY || '',
   geminiTextModel: process.env.GEMINI_TEXT_MODEL || 'gemini-3.8-flash',
-  geminiFallbackModel: process.env.GEMINI_FALLBACK_MODEL || 'gemini-3.5-flash-lite',
+  geminiFallbackModels: (process.env.GEMINI_FALLBACK_MODEL || 'gemini-3.5-flash-lite,gemini-3.1-flash-lite')
+    .split(',')
+    .map((name) => name.trim())
+    .filter(Boolean),
   geminiImageModel: process.env.GEMINI_IMAGE_MODEL || 'gemini-3.1-flash-lite-image',
 };

@@ -14,9 +14,9 @@ function isBusyError(error) {
   return /\b(429|500|503|504)\b|UNAVAILABLE|RESOURCE_EXHAUSTED|high demand|overloaded/i.test(text);
 }
 
-// Tries the main model, retries when Google is busy, then tries the backup model
+// Tries the main model, then each backup model. Busy errors get one retry.
 async function generateWithFallback(params) {
-  const models = [params.model, config.geminiFallbackModel].filter(
+  const models = [params.model, ...config.geminiFallbackModels].filter(
     (model, index, list) => model && list.indexOf(model) === index
   );
 
@@ -27,8 +27,11 @@ async function generateWithFallback(params) {
         return await client.models.generateContent({ ...params, model });
       } catch (error) {
         lastError = error;
-        if (!isBusyError(error)) break; // not a busy error: go straight to the backup model
-        console.warn(`Gemini model ${model} is busy (attempt ${attempt}).`);
+        const busy = isBusyError(error);
+        console.warn(
+          `Gemini ${model} failed (attempt ${attempt}, ${busy ? 'busy' : 'error'}): ${String(error.message).slice(0, 150)}`
+        );
+        if (!busy) break; // a real error (for example a wrong model name): try the next model
         await sleep(1500 * attempt);
       }
     }
